@@ -11,10 +11,10 @@ export const Scene: React.FC = () => {
   return (
     <Canvas>
       <CameraControls />
-      <ambientLight />
+      {/* <ambientLight />
       <pointLight position={[5, 5, -10]} intensity={55} />
       <pointLight position={[16, 5, -10]} intensity={55} />
-      <pointLight position={[16, 5, 3]} intensity={55} />
+      <pointLight position={[16, 5, 3]} intensity={55} /> */}
       <Gizmo />
 
       {/* <PointCloud /> */}

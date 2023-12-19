@@ -9,7 +9,7 @@ export const CameraControls: React.FC = () => {
   useEffect(() => {
     if (controlsRef.current) {
       controlsRef.current.target.set(0, 0, 0)
-      controlsRef.current.object.position.set(0, .1, .5)
+      controlsRef.current.object.position.set(0, 1, 5)
       // controlsRef.current.maxPolarAngle = Math.PI / 2 - .1
       controlsRef.current.update()
     }
