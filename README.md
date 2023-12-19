@@ -1,3 +1,11 @@
+# To use ply-2-pcd converter
+
+Python versions 3.7 - 3.10
+
+```
+  brew install libomp
+```
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.

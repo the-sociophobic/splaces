@@ -1,5 +1,3 @@
-import React from 'react'
-
 import './assets/sass/index.sass'
 import { Scene } from './units/Scene'
 
