@@ -22,7 +22,7 @@ const vertexShader = `
 
   void main(){
     vColor = color;
-    gl_PointSize = 5.0;
+    gl_PointSize = 2.0;
 
     // get a turbulent 3d noise using the normal, normal to high freq
     noise = 10.0 *  -.10 * turbulence( .5 * normal );

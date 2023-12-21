@@ -27,7 +27,7 @@ const NoiseMaterial = () => {
     }
 
     if (noiseK.current > 0) {
-      noiseK.current *= 0.97
+      noiseK.current *= 0.95
     }
   })
 
