@@ -4,13 +4,17 @@ import { PCDLoader } from 'three/examples/jsm/loaders/PCDLoader'
 
 import NoiseMaterial from './NoiseMaterial'
 import isProd from '../utils/isProd'
+import useStore from '../hooks/useStore'
 
 
 const PointCloud: FC = () => {
+  const setModelLoaded = useStore(state => state.setModelLoaded)
   const obj = useLoader(PCDLoader, isProd() ?
     'pcd/karelia_drift.pcd'
     :
     'splaces/pcd/karelia_drift.pcd'
+    , undefined,
+    e => e.loaded === e.total && setModelLoaded(true)
   )
   const primRef = useRef<ThreeElements['primitive']>(null)
 

@@ -1,18 +1,28 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react'
+import { shallow } from 'zustand/shallow'
+
+import useStore from '../hooks/useStore'
+
 
 const RequireSensorPermisson = () => {
-  const [showButton, setShowButton] = useState(true)
+  const [
+    permissionGranted,
+    setPermissionGranted
+  ] = useStore(state => [
+    state.permissionGranted,
+    state.setPermissionGranted,
+  ], shallow)
 
   const _permission = () => {
-    if (typeof (DeviceMotionEvent) !== "undefined" && typeof ((DeviceMotionEvent as any).requestPermission) === "function") {
+    if (typeof (DeviceMotionEvent) !== 'undefined' && typeof ((DeviceMotionEvent as any).requestPermission) === 'function') {
       (DeviceMotionEvent as any).requestPermission()
         .then((response: any) => {
           if (response === 'granted')
-            setShowButton(false)
+            setPermissionGranted(true)
         })
         .catch(console.error)
     } else {
-      alert("DeviceMotionEvent is not defined");
+      console.log('DeviceMotionEvent is not defined');
     }
   }
 
@@ -22,7 +32,7 @@ const RequireSensorPermisson = () => {
 
   return (
     <>
-      {showButton &&
+      {!permissionGranted &&
         <button
           onClick={() => _permission()}
         >
