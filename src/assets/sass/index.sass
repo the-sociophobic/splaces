@@ -1,49 +1,56 @@
 $font-color: white
 $bg-color: black
 
-*
-  color: $font-color
-  margin: 0
-  box-sizing: border-box
-  font-size: 19px
-
-.App
-  height: 100vh
-  overflow-x: hidden
-  position: relative
-  background-color: $bg-color
-
-
-
-.noselect
-  -webkit-touch-callout: none  /* iOS Safari */
-  -webkit-user-select: none    /* Safari */
-  -khtml-user-select: none     /* Konqueror HTML */
-  -moz-user-select: none       /* Firefox */
-  -ms-user-select: none        /* Internet Explorer/Edge */
-  user-select: none            /* Non-prefixed version, currently supported by Chrome and Opera */
-
-.button
-  padding: 0
-  cursor: pointer
-  outline: none
-  border: none
-  background-color: rgba(0, 0, 0, 0)
-
-.abs-cover
-  position: absolute
+  
+#Lef-root
   width: 100%
   height: 100%
-  top: 0
-  left: 0
+  position: relative
+
+  *
+    color: $font-color
+    margin: 0
+    box-sizing: border-box
+    font-size: 19px
+
+  .App
+    height: 100%
+    overflow-x: hidden
+    position: relative
+    background-color: $bg-color
+
+    .Loader
+      position: absolute
+      top: 0
+      left: 0
+      width: 100%
+      height: 100%
+      background-color: black
+      &--hidden
+        display: none
+
+    .noselect
+      -webkit-touch-callout: none  /* iOS Safari */
+      -webkit-user-select: none    /* Safari */
+      -khtml-user-select: none     /* Konqueror HTML */
+      -moz-user-select: none       /* Firefox */
+      -ms-user-select: none        /* Internet Explorer/Edge */
+      user-select: none            /* Non-prefixed version, currently supported by Chrome and Opera */
+
+    .button
+      padding: 0
+      cursor: pointer
+      outline: none
+      border: none
+      background-color: rgba(0, 0, 0, 0)
+
+    .abs-cover
+      position: absolute
+      width: 100%
+      height: 100%
+      top: 0
+      left: 0
 
 
-.Loader
-  position: fixed
-  top: 0
-  left: 0
-  width: 100vw
-  height: 100vh
-  background-color: black
-  &--hidden
-    display: none
+
+

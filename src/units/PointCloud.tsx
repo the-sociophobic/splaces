@@ -9,11 +9,15 @@ import useStore from '../hooks/useStore'
 
 const PointCloud: FC = () => {
   const setModelLoaded = useStore(state => state.setModelLoaded)
-  const obj = useLoader(PCDLoader, isProd() ?
-    'pcd/karelia_drift.pcd'
-    :
-    'splaces/pcd/karelia_drift.pcd'
-    , undefined,
+  // const asset_path = isProd() ?
+  // 'pcd/karelia_drift.pcd'
+  // :
+  // 'https://raw.githubusercontent.com/the-sociophobic/splaces/main/public/pcd/karelia_drift.pcd'
+  const asset_path = 'https://raw.githubusercontent.com/the-sociophobic/splaces/main/public/pcd/karelia_drift.pcd'
+  const obj = useLoader(
+    PCDLoader,
+    asset_path,
+    undefined,
     e => e.loaded === e.total && setModelLoaded(true)
   )
   const primRef = useRef<ThreeElements['primitive']>(null)
