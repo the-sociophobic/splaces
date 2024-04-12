@@ -8,7 +8,9 @@ const Loader: FC = () => {
 
   return (
     <div className={`Loader ${modelLoaded && 'Loader--hidden'}`}>
-      Загрузка...
+      <div className='Loader__text'>
+        Loading...
+      </div>
     </div>
   )
 }

@@ -33,6 +33,12 @@ $bg-color: black
       background-color: black
       &--hidden
         display: none
+      &__text
+        position: absolute
+        left: 50vw
+        bottom: 20vh
+        transform: translate(-50%, 0)
+        font-size: 25px
 
     .noselect
       -webkit-touch-callout: none  /* iOS Safari */
@@ -42,12 +48,19 @@ $bg-color: black
       -ms-user-select: none        /* Internet Explorer/Edge */
       user-select: none            /* Non-prefixed version, currently supported by Chrome and Opera */
 
-    .button
+    .enable-acc
+      position: fixed
+      z-index: 10000
+      left: 50vw
+      bottom: 20vh
+      transform: translate(-50%, 0)
       padding: 0
       cursor: pointer
       outline: none
       border: none
       background-color: rgba(0, 0, 0, 0)
+      font-size: 25px
+      width: 80vw
 
     .abs-cover
       position: absolute

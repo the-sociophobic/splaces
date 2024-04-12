@@ -7,10 +7,12 @@ import useStore from '../hooks/useStore'
 const RequireSensorPermisson = () => {
   const [
     permissionGranted,
-    setPermissionGranted
+    setPermissionGranted,
+    modelLoaded
   ] = useStore(state => [
     state.permissionGranted,
     state.setPermissionGranted,
+    state.modelLoaded,
   ], shallow)
 
   const _permission = () => {
@@ -32,11 +34,12 @@ const RequireSensorPermisson = () => {
 
   return (
     <>
-      {!permissionGranted &&
+      {(!permissionGranted && modelLoaded) &&
         <button
+          className='enable-acc'
           onClick={() => _permission()}
         >
-          Разрешить доступ
+          Enable motion
         </button>
       }
     </>
