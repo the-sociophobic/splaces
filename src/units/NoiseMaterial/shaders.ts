@@ -1,6 +1,9 @@
 const vertexShader = `
   attribute vec3 color;
   uniform float noiseK;
+  uniform float touchK;
+  uniform vec3 rayStart;
+  uniform vec3 rayEnd;
   varying vec3 vColor;
   varying float noise;
 
@@ -29,7 +32,11 @@ const vertexShader = `
     // get a 3d noise using the position, low frequency
     float b = pnoise( 0.05 * position, vec3( 100.0 ) );
     // compose both noises
-    float displacement = - noiseK * (noise + b);
+    // vec4 proj_pos = projectionMatrix * modelViewMatrix * vec4(position, 1.);
+    vec4 proj_pos = vec4(position, 1.);
+    float touchNear = dot(rayEnd, proj_pos.xyz - rayStart);
+    float touchNearK = 1.0 / touchNear / touchNear;
+    float displacement = - (noiseK + touchNearK * touchK) * (noise + b);
     vec3 newPosition = position + normal * displacement;
 
     gl_Position = projectionMatrix * modelViewMatrix * vec4(newPosition, 1.);
