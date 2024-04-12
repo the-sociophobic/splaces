@@ -2,16 +2,16 @@ $font-color: white
 $bg-color: black
 
 
-// body
-//   margin: 0
-//   width: 100vw  
-//   height: 100vh
+body
+  margin: 0
+  width: 100vw  
+  height: 100vh
+  background-color: $bg-color
 
 #Lef-root
   width: 100%
   height: 100%
   position: relative
-
   *
     color: $font-color
     margin: 0
@@ -22,7 +22,19 @@ $bg-color: black
     height: 100%
     overflow-x: hidden
     position: relative
-    background-color: $bg-color
+    position: relative
+    -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 75%, rgba(0, 0, 0, 0))
+    mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 75%, rgba(0, 0, 0, 0))
+    // &::after
+    //   top: 0
+    //   left: 0
+    //   content: ''
+    //   position: absolute
+    //   width: 100%
+    //   height: 100%
+    //   // background-color: black
+    //   z-index: 10
+    //   box-shadow: inset 0px 0px 75px 75px black
 
     .Loader
       position: absolute

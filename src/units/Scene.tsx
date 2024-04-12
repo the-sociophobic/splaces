@@ -9,7 +9,7 @@ import RayTest from './RayTest'
 
 export const Scene: React.FC = () => {  
   return (
-    <Canvas>
+    <Canvas onCreated={state => state.gl.setClearAlpha(0)}>
       <CameraControls />
       <ambientLight />  
       {/* <RayTest /> */}

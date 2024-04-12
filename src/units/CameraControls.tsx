@@ -13,6 +13,7 @@ export const CameraControls: React.FC = () => {
       controlsRef.current.object.position.set(-7.5, 2.3, .9)
       controlsRef.current.maxDistance = 10
       controlsRef.current.enabled = isDesktop
+      controlsRef.current.enableZoom = false
       controlsRef.current.update()
     }
   }, [controlsRef.current])

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { shallow } from 'zustand/shallow'
 
 import useStore from '../hooks/useStore'
+import { isIOS } from 'react-device-detect'
 
 
 const RequireSensorPermisson = () => {
@@ -34,7 +35,7 @@ const RequireSensorPermisson = () => {
 
   return (
     <>
-      {(!permissionGranted && modelLoaded) &&
+      {(!permissionGranted && modelLoaded && isIOS) &&
         <button
           className='enable-acc'
           onClick={() => _permission()}

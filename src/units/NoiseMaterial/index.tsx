@@ -1,12 +1,16 @@
-import { useEffect, useRef, useState } from 'react'
-import { ShaderMaterial, Vector3 } from 'three'
+import { useEffect, useRef } from 'react'
+import { ShaderMaterial, Vector2, Vector3 } from 'three'
 import { useFrame, useThree } from '@react-three/fiber'
+import { isDesktop } from 'react-device-detect'
 import { debounce } from 'lodash'
 
-import vertexShader from './shader.vert?raw'
-import fragmentShader from './shader.frag?raw'
+import { vertShader, fragShader } from './shaders'
 import useStore from '../../hooks/useStore'
-import { isDesktop } from 'react-device-detect'
+import { ThreeRef, notifyThreeRef, useSubscribeThreeRef } from '../../utils/ThreeRef'
+
+
+const cameraPos = new Vector3()
+const prevCameraPos = new Vector3()
 
 
 const NoiseMaterial = () => {
@@ -21,12 +25,18 @@ const NoiseMaterial = () => {
       if (shaderRef.current)
         if (shaderRef.current.uniforms.noiseK.value > 0) {
           shaderRef.current.uniforms.noiseK.value *= 0.975
+          shaderRef.current.uniformsNeedUpdate = true
         }
     } else {
       if (shaderRef.current) {
-        const posDelta = camera.position.clone().add(prevCamPos.current.clone().negate()).length()
+        cameraPos.copy(camera.position)
+        prevCameraPos.copy(prevCamPos.current)
+
+        const posDelta = cameraPos.add(prevCameraPos.negate()).length()
+
         noiseK.current = Math.min(Math.max(noiseK.current, posDelta * 3), 2.5)
         shaderRef.current.uniforms.noiseK.value = noiseK.current
+        shaderRef.current.uniformsNeedUpdate = true
         prevCamPos.current.copy(camera.position)
       }
 
@@ -45,8 +55,10 @@ const NoiseMaterial = () => {
 
       const speed = ((acc.x || 0) ** 2 + (acc.y || 0) ** 2 + (acc.z || 0) ** 2) / 30
 
-      if (speed > shaderRef.current.uniforms.noiseK.value)
+      if (speed > shaderRef.current.uniforms.noiseK.value) {
         shaderRef.current.uniforms.noiseK.value = speed
+        shaderRef.current.uniformsNeedUpdate = true
+      }
     }, 10)
 
     window.addEventListener('devicemotion', handleDeviceMotion)
@@ -56,24 +68,82 @@ const NoiseMaterial = () => {
 
 
 
-  const { raycaster, pointer } = useThree()
+  const { raycaster } = useThree()
+  const rayOrigin: ThreeRef<Vector3> = new ThreeRef<Vector3>(raycaster.ray.origin)
+  const rayDirection: ThreeRef<Vector3> = new ThreeRef<Vector3>(raycaster.ray.direction)
+  const touchK: ThreeRef<number> = new ThreeRef<number>(1)
+
+
+  const updShaderUniforms = (pointer: Vector2) => {
+    raycaster.setFromCamera(pointer.multiplyScalar(-1), camera)
+    rayOrigin.current = raycaster.ray.origin
+    notifyThreeRef(rayOrigin)
+    rayDirection.current = raycaster.ray.direction
+    notifyThreeRef(rayDirection)
+    touchK.current = isDesktop ? .5 : 1
+    notifyThreeRef(touchK)
+  }
+
+  const handleTouchMove = debounce((e: TouchEvent) => {
+    if (!shaderRef.current)
+      return
+
+    const _pointer = new Vector2(
+      e.touches[0].clientX / document.documentElement.clientWidth * 2 - 1,
+      e.touches[0].clientY / document.documentElement.clientHeight * 2 - 1,
+    )
+
+    updShaderUniforms(_pointer)
+  })
+  const handleMouseMove = debounce((e: MouseEvent) => {
+    if (!shaderRef.current)
+      return
+
+    const _pointer = new Vector2(
+      e.clientX / document.documentElement.clientWidth - .5,
+      - e.clientY / document.documentElement.clientHeight + .5,
+    )
+
+    updShaderUniforms(_pointer)
+  })
+
+  useSubscribeThreeRef(rayOrigin, () => {
+    if (shaderRef.current) {
+      shaderRef.current.uniforms.rayOrigin.value = rayOrigin.current.toArray()
+      shaderRef.current.uniformsNeedUpdate = true
+    }
+  })
+  useSubscribeThreeRef(rayDirection, () => {
+    if (shaderRef.current) {
+      shaderRef.current.uniforms.rayDirection.value = rayDirection.current.toArray()
+      shaderRef.current.uniformsNeedUpdate = true
+    }
+  })
+  useSubscribeThreeRef(touchK, () => {
+    if (shaderRef.current) {
+      shaderRef.current.uniforms.touchK.value = touchK.current
+      shaderRef.current.uniformsNeedUpdate = true
+    }
+  })
+
 
   useEffect(() => {
-    const handleTouchMove = debounce((event: TouchEvent) => {
-      if (!shaderRef.current)
-        return
-
-      raycaster.setFromCamera(pointer.clone().multiplyScalar(-1), camera)
-      shaderRef.current.uniforms.rayOrigin.value = raycaster.ray.origin
-      shaderRef.current.uniforms.rayDirection.value = raycaster.ray.direction
-      shaderRef.current.uniforms.touchK.value = 1
-      shaderRef.current.uniformsNeedUpdate = true
-    })
-
-    window.addEventListener('touchmove', handleTouchMove)
+    if (!isDesktop)
+      window.addEventListener('touchmove', handleTouchMove)
 
     return () => {
-      window.removeEventListener('touchmove', handleTouchMove)
+      if (!isDesktop)
+        window.removeEventListener('touchmove', handleTouchMove)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (isDesktop)
+      window.addEventListener('mousemove', handleMouseMove)
+
+    return () => {
+      if (isDesktop)
+        window.removeEventListener('mousemove', handleMouseMove)
     }
   }, [])
 
@@ -105,18 +175,17 @@ const NoiseMaterial = () => {
     if (!shaderRef.current || isDesktop)
       return
 
-    // if (shaderRef.current.uniforms.touchK.value > 0 && !touching.current) {
-    if (shaderRef.current.uniforms.touchK.value > 0 && !touching.current) {
-      shaderRef.current.uniforms.touchK.value *= 0.975
-      shaderRef.current.uniformsNeedUpdate = true
+    if (shaderRef.current.uniforms.touchK.value > 0 && !touching.current && !isDesktop) {
+      touchK.current = touchK.current * 0.975
+      notifyThreeRef(touchK)
     }
   })
 
   return (
     <shaderMaterial
       ref={shaderRef}
-      fragmentShader={fragmentShader}
-      vertexShader={vertexShader}
+      fragmentShader={fragShader}
+      vertexShader={vertShader}
       uniforms={{
         noiseK: {
           value: 0
