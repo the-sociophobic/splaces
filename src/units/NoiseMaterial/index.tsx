@@ -3,7 +3,8 @@ import { ShaderMaterial, Vector3 } from 'three'
 import { useFrame, useThree } from '@react-three/fiber'
 import { debounce } from 'lodash'
 
-import { fragmentShader, vertexShader } from './shaders'
+import vertexShader from './shader.vert?raw'
+import fragmentShader from './shader.frag?raw'
 import useStore from '../../hooks/useStore'
 import { isDesktop } from 'react-device-detect'
 
@@ -62,11 +63,11 @@ const NoiseMaterial = () => {
       if (!shaderRef.current)
         return
 
-      raycaster.setFromCamera(pointer, camera)
-      shaderRef.current.uniforms.rayStart.value = raycaster.ray.origin
-      shaderRef.current.uniforms.rayEnd.value = raycaster.ray.direction
+      raycaster.setFromCamera(pointer.clone().multiplyScalar(-1), camera)
+      shaderRef.current.uniforms.rayOrigin.value = raycaster.ray.origin
+      shaderRef.current.uniforms.rayDirection.value = raycaster.ray.direction
       shaderRef.current.uniforms.touchK.value = 1
-      // shaderRef.current.uniformsNeedUpdate = true
+      shaderRef.current.uniformsNeedUpdate = true
     })
 
     window.addEventListener('touchmove', handleTouchMove)
@@ -76,12 +77,38 @@ const NoiseMaterial = () => {
     }
   }, [])
 
+  const touching = useRef(false)  
+  useEffect(() => {
+    const handleTouchStart = (event: TouchEvent) => {
+      touching.current = true
+    }
+
+    window.addEventListener('touchstart', handleTouchStart)
+
+    return () => {
+      window.removeEventListener('touchstart', handleTouchStart)
+    }
+  }, [])
+  useEffect(() => {
+    const handleTouchEnd = (event: TouchEvent) => {
+      touching.current = false
+    }
+
+    window.addEventListener('touchend', handleTouchEnd)
+
+    return () => {
+      window.removeEventListener('touchend', handleTouchEnd)
+    }
+  }, [])
+
   useFrame(() => {
     if (!shaderRef.current || isDesktop)
       return
 
-    if (shaderRef.current.uniforms.touchK.value > 0) {
+    // if (shaderRef.current.uniforms.touchK.value > 0 && !touching.current) {
+    if (shaderRef.current.uniforms.touchK.value > 0 && !touching.current) {
       shaderRef.current.uniforms.touchK.value *= 0.975
+      shaderRef.current.uniformsNeedUpdate = true
     }
   })
 
@@ -97,10 +124,10 @@ const NoiseMaterial = () => {
         touchK: {
           value: 0
         },
-        rayStart: {
+        rayOrigin: {
           value: [0, 0, 0]
         },
-        rayEnd: {
+        rayDirection: {
           value: [0, 20, 0]
         },
       }}
