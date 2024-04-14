@@ -17,10 +17,15 @@ const NoiseMaterial = () => {
   const { permissionGranted } = useStore(state => state)
   const noiseK = useRef(0)
   const shaderRef = useRef<ShaderMaterial>(null)
-  const { camera } = useThree()
+  const { camera, pointer } = useThree()
   const prevCamPos = useRef(new Vector3())
 
+  useEffect(() => {
+    console.log('b')
+  }, [pointer])
+
   useFrame(() => {
+    console.log('a')
     if (permissionGranted) {
       if (shaderRef.current)
         if (shaderRef.current.uniforms.noiseK.value > 0) {
@@ -63,7 +68,7 @@ const NoiseMaterial = () => {
 
     window.addEventListener('devicemotion', handleDeviceMotion)
 
-    return () => window.removeEventListener('devicemotion', handleDeviceMotion)
+    return () => {}//window.removeEventListener('devicemotion', handleDeviceMotion)
   }, [permissionGranted])
 
 
@@ -132,8 +137,8 @@ const NoiseMaterial = () => {
       window.addEventListener('touchmove', handleTouchMove)
 
     return () => {
-      if (!isDesktop)
-        window.removeEventListener('touchmove', handleTouchMove)
+      // if (!isDesktop)
+      //   window.removeEventListener('touchmove', handleTouchMove)
     }
   }, [])
 
@@ -142,8 +147,8 @@ const NoiseMaterial = () => {
       window.addEventListener('mousemove', handleMouseMove)
 
     return () => {
-      if (isDesktop)
-        window.removeEventListener('mousemove', handleMouseMove)
+      // if (isDesktop)
+      //   window.removeEventListener('mousemove', handleMouseMove)
     }
   }, [])
 
@@ -156,7 +161,7 @@ const NoiseMaterial = () => {
     window.addEventListener('touchstart', handleTouchStart)
 
     return () => {
-      window.removeEventListener('touchstart', handleTouchStart)
+      // window.removeEventListener('touchstart', handleTouchStart)
     }
   }, [])
   useEffect(() => {
@@ -167,7 +172,7 @@ const NoiseMaterial = () => {
     window.addEventListener('touchend', handleTouchEnd)
 
     return () => {
-      window.removeEventListener('touchend', handleTouchEnd)
+      // window.removeEventListener('touchend', handleTouchEnd)
     }
   }, [])
 
