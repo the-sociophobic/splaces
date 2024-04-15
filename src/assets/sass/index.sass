@@ -11,12 +11,16 @@ $bg-color: black
 #Lef-root
   width: 100%
   height: 100%
+  // height: 200vw
   position: relative
   *
+    font-family: 'Roboto Mono'
+    font-weight: 400
+    font-variation-settings: 'wght' 400
     color: $font-color
     margin: 0
     box-sizing: border-box
-    font-size: 19px
+    font-size: 24px
 
   .App
     height: 100%
@@ -47,10 +51,35 @@ $bg-color: black
         display: none
       &__text
         position: absolute
-        left: 50vw
-        bottom: 20vh
-        transform: translate(-50%, 0)
-        font-size: 25px
+        left: 0
+        top: -35px
+        // transform: translate(-50%, 0)
+        // font-size: 25px
+      &__progress
+        position: absolute
+        top: 40%
+        left: 50%
+        width: 50%
+        height: 12px
+        transform: translateX(-50%)
+        &__bar
+          background-color: rgba(97, 175, 90, 1)
+          position: absolute
+          top: 0
+          left: 0
+          height: 100%
+          // transition: width .1s
+          animation: progressBar 25s ease infinite
+          @keyframes progressBar
+            0%
+              width: 5%
+            5%
+              width: 15%
+            30%
+              width: 30%
+            70%
+              width: 90%
+
 
     .noselect
       -webkit-touch-callout: none  /* iOS Safari */
