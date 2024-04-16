@@ -57,7 +57,7 @@ const UniformsState: FC<UniformsStateType> = ({
   const prevCamPos = useRef(new Vector3())
   const { camera, pointer: threePointer } = useThree()
 
-  useFrame(() => {
+  useFrame((state, deltaTime) => {
     if (!materialIsDefined() || permissionGranted)
       return
 
@@ -66,7 +66,10 @@ const UniformsState: FC<UniformsStateType> = ({
 
     const posDelta = cameraPos.add(prevCameraPos.negate()).length()
 
-    noiseK.current = Math.min(Math.max(noiseK.current, posDelta * 3), MAX_MOVE_NOISE)
+    noiseK.current = Math.min(
+      Math.max(noiseK.current, posDelta * 1000 * deltaTime),
+      MAX_MOVE_NOISE
+    )
     notifyThreeRef(noiseK)
     prevCamPos.current.copy(camera.position)
   })
@@ -93,18 +96,18 @@ const UniformsState: FC<UniformsStateType> = ({
   }, [permissionGranted])
 
   // NOISE FADING
-  useFrame(() => {
+  useFrame((state, deltaTime) => {
     if (!materialIsDefined())
       return
 
     if (noiseK.current > 0) {
-      noiseK.current *= permissionGranted ? 0.975 : 0.95
+      noiseK.current *= (permissionGranted ? (0.975 - deltaTime * 5) : (0.95 - deltaTime * 5))
       notifyThreeRef(noiseK)
     }
 
     if (!isDesktop) {
       if (touchK.current > 0 && !touching.current) {
-        touchK.current = touchK.current * 0.975
+        touchK.current = touchK.current * (0.975 - deltaTime * 5)
         notifyThreeRef(touchK)
       }  
     }

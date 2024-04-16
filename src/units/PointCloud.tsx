@@ -38,7 +38,7 @@ const PointCloud: FC<PointCloudType> = ({
   const setModelLoaded = useStore(state => state.setModelLoaded)
   const model = useStore(state => state.model)
   const asset_path = isProd() ?
-    `https://raw.githubusercontent.com/the-sociophobic/splaces/4e2d144f4b608c13a45c46fdb7fb5133d84a0246/public/pcd/${model}.pcd`
+    `https://cdn.tochkadostupa.spb.ru/the_sociophobic/splaces/pcd/${model}.pcd`
     :
     `./splaces/pcd/${model}.pcd`
   const obj = useLoader(
