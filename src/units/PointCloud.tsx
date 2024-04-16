@@ -23,8 +23,10 @@ const PointCloud: FC<PointCloudType> = ({
   // 'pcd/karelia_drift.pcd'
   // :
   // 'https://raw.githubusercontent.com/the-sociophobic/splaces/main/public/pcd/karelia.pcd'
-  // const asset_path = 'https://raw.githubusercontent.com/the-sociophobic/splaces/main/public/pcd/karelia.pcd'
-  const asset_path = './splaces/pcd/karelia.pcd'
+  const asset_path = 'https://raw.githubusercontent.com/the-sociophobic/splaces/main/public/pcd/karelia.pcd'
+  // const asset_path = './splaces/pcd/karelia.pcd'
+  // const asset_path = './splaces/pcd/shipovnik.pcd'
+  // const asset_path = './splaces/pcd/tree.pcd'
   const obj = useLoader(
     PCDLoader,
     asset_path,

@@ -30,21 +30,21 @@ const UniformsState: FC<UniformsStateType> = ({
 
   useFrame(() => {
     if (permissionGranted) {
-      if (shaderRef.current)
-        if (shaderRef.current.uniforms.noiseK.value > 0) {
-          shaderRef.current.uniforms.noiseK.value *= 0.975
-          shaderRef.current.uniformsNeedUpdate = true
+      if (pointCloudRef.current && pointCloudRef.current.material)
+        if (pointCloudRef.current.material.uniforms.noiseK.value > 0) {
+          pointCloudRef.current.material.uniforms.noiseK.value *= 0.975
+          pointCloudRef.current.material.uniformsNeedUpdate = true
         }
     } else {
-      if (shaderRef.current) {
+      if (pointCloudRef.current && pointCloudRef.current.material) {
         cameraPos.copy(camera.position)
         prevCameraPos.copy(prevCamPos.current)
 
         const posDelta = cameraPos.add(prevCameraPos.negate()).length()
 
         noiseK.current = Math.min(Math.max(noiseK.current, posDelta * 3), 2.5)
-        shaderRef.current.uniforms.noiseK.value = noiseK.current
-        shaderRef.current.uniformsNeedUpdate = true
+        pointCloudRef.current.material.uniforms.noiseK.value = noiseK.current
+        pointCloudRef.current.material.uniformsNeedUpdate = true
         prevCamPos.current.copy(camera.position)
       }
 
@@ -63,9 +63,9 @@ const UniformsState: FC<UniformsStateType> = ({
 
       const speed = ((acc.x || 0) ** 2 + (acc.y || 0) ** 2 + (acc.z || 0) ** 2) / 30
 
-      if (speed > shaderRef.current.uniforms.noiseK.value) {
-        shaderRef.current.uniforms.noiseK.value = speed
-        shaderRef.current.uniformsNeedUpdate = true
+      if (speed > pointCloudRef.current.material.uniforms.noiseK.value) {
+        pointCloudRef.current.material.uniforms.noiseK.value = speed
+        pointCloudRef.current.material.uniformsNeedUpdate = true
       }
     }, 10)
 
@@ -114,21 +114,21 @@ const UniformsState: FC<UniformsStateType> = ({
   })
 
   useSubscribeThreeRef(rayOrigin, () => {
-    if (shaderRef.current) {
-      shaderRef.current.uniforms.rayOrigin.value = rayOrigin.current.toArray()
-      shaderRef.current.uniformsNeedUpdate = true
+    if (pointCloudRef.current && pointCloudRef.current.material) {
+      pointCloudRef.current.material.uniforms.rayOrigin.value = rayOrigin.current.toArray()
+      pointCloudRef.current.material.uniformsNeedUpdate = true
     }
   })
   useSubscribeThreeRef(rayDirection, () => {
-    if (shaderRef.current) {
-      shaderRef.current.uniforms.rayDirection.value = rayDirection.current.toArray()
-      shaderRef.current.uniformsNeedUpdate = true
+    if (pointCloudRef.current && pointCloudRef.current.material) {
+      pointCloudRef.current.material.uniforms.rayDirection.value = rayDirection.current.toArray()
+      pointCloudRef.current.material.uniformsNeedUpdate = true
     }
   })
   useSubscribeThreeRef(touchK, () => {
-    if (shaderRef.current) {
-      shaderRef.current.uniforms.touchK.value = touchK.current
-      shaderRef.current.uniformsNeedUpdate = true
+    if (pointCloudRef.current && pointCloudRef.current.material) {
+      pointCloudRef.current.material.uniforms.touchK.value = touchK.current
+      pointCloudRef.current.material.uniformsNeedUpdate = true
     }
   })
 
@@ -188,7 +188,7 @@ const UniformsState: FC<UniformsStateType> = ({
     if (!shaderRef.current || isDesktop)
       return
 
-    if (shaderRef.current.uniforms.touchK.value > 0 && !touching.current && !isDesktop) {
+    if (pointCloudRef.current.material.uniforms.touchK.value > 0 && !touching.current && !isDesktop) {
       touchK.current = touchK.current * 0.975
       notifyThreeRef(touchK)
     }
