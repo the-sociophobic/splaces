@@ -1,12 +1,6 @@
-import { FC, useEffect, useRef, useState } from 'react'
-import { ShaderMaterial, Vector2, Vector3 } from 'three'
-import { useFrame, useThree } from '@react-three/fiber'
-import { isDesktop } from 'react-device-detect'
-import { debounce } from 'lodash'
+import { FC } from 'react'
 
 import { vertShader, fragShader } from './shaders'
-import useStore from '../../hooks/useStore'
-import { ThreeRef, notifyThreeRef, useSubscribeThreeRef } from '../../utils/ThreeRef'
 
 
 export type NoiseMaterialType = {

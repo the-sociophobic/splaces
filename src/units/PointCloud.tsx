@@ -1,32 +1,48 @@
-import { FC, useEffect, useRef, useState } from 'react'
-import { ThreeElements, useLoader } from '@react-three/fiber'
-import { useProgress } from '@react-three/drei'
+import { FC } from 'react'
+import { useLoader } from '@react-three/fiber'
 import { PCDLoader } from 'three/examples/jsm/loaders/PCDLoader'
-import * as THREE from 'three'
 
 import NoiseMaterial from './NoiseMaterial'
 import isProd from '../utils/isProd'
 import useStore from '../hooks/useStore'
-import { debounce } from 'lodash'
 
 
 export type PointCloudType = {
   shaderRef: any
   pointCloudRef: any
 }
+
+export type Vector3Array = [number, number, number]
+export type ModelPosType = {
+  position: Vector3Array
+  rotation: Vector3Array
+}
+
+const modelsPos: { [key: string]: ModelPosType } = {
+  'karelia': {
+    position: [0, -5.5, 1],
+    rotation: [Math.PI * 1.2, 0, 0],
+  },
+  'shipovnik': {
+    position: [5, -14.5, 0],
+    rotation: [Math.PI * 1.2, 0, 0],
+  },
+  'tree': {
+    position: [0, -15.5, 1],
+    rotation: [Math.PI * 1.2, 0, -Math.PI / 2],
+  },
+}
+
 const PointCloud: FC<PointCloudType> = ({
   shaderRef,
   pointCloudRef
 }) => {
   const setModelLoaded = useStore(state => state.setModelLoaded)
-  // const asset_path = isProd() ?
-  // 'pcd/karelia_drift.pcd'
-  // :
-  // 'https://raw.githubusercontent.com/the-sociophobic/splaces/main/public/pcd/karelia.pcd'
-  const asset_path = 'https://raw.githubusercontent.com/the-sociophobic/splaces/main/public/pcd/karelia.pcd'
-  // const asset_path = './splaces/pcd/karelia.pcd'
-  // const asset_path = './splaces/pcd/shipovnik.pcd'
-  // const asset_path = './splaces/pcd/tree.pcd'
+  const model = useStore(state => state.model)
+  const asset_path = isProd() ?
+    `https://raw.githubusercontent.com/the-sociophobic/splaces/main/public/pcd/${model}.pcd`
+    :
+    `./splaces/pcd/${model}.pcd`
   const obj = useLoader(
     PCDLoader,
     asset_path,
@@ -36,33 +52,19 @@ const PointCloud: FC<PointCloudType> = ({
         setTimeout(() => setModelLoaded(true), 5)
     }
   )
-  const primRef = useRef<ThreeElements['primitive']>(null)
+  const { position, rotation } = modelsPos[model]
 
-  const shaderVersion = useRef(1)
-  useEffect(() => {
-    const updShaderVersion = debounce(() => {
-      if (shaderVersion.current)
-      console.log('shaderVersion', shaderVersion.current)
-      shaderVersion.current += 1
-    }, 10)
-
-    window.addEventListener('scroll', updShaderVersion)
-
-    return () => window.removeEventListener('scroll', updShaderVersion)
-  }, [])
 
   return (
     <primitive
       ref={pointCloudRef}
       object={obj}
-      position={[0, -5.5, 1]}
-      rotation={[Math.PI * 1.2, 0, 0]}
+      position={position}
+      rotation={rotation}
       scale={[1, 1, 1]}
-      // key={shaderVersion.current || 1}
     >
       <NoiseMaterial
         shaderRef={shaderRef}
-        // key={shaderVersion.current || 1}
       />
     </primitive>
   )
