@@ -9,17 +9,17 @@ const RayTest: React.FC = () => {
   const [_end, set_end] = useState(raycaster.ray.direction.toArray())
 
   useEffect(() => {
-    const handleTouchMove = debounce((event: TouchEvent) => {
+    const handleTouchMove = debounce(() => {
       console.log(pointer)
       raycaster.setFromCamera(pointer, camera)
       set_start(raycaster.ray.origin.toArray())
       set_end(raycaster.ray.direction.clone().add(raycaster.ray.origin).toArray())
     })
 
-    window.addEventListener('touchmove', handleTouchMove)
+    window.addEventListener('mousemove', handleTouchMove)
 
     return () => {
-      window.removeEventListener('touchmove', handleTouchMove)
+      window.removeEventListener('mousemove', handleTouchMove)
     }
   }, [])
 

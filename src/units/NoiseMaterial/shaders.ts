@@ -36,10 +36,14 @@ void main(){
 
   // Add noise on touch
   vec3 ray = rayDirection;
-  vec3 pos = position - rayOrigin;
+  // vec3 pos = position - rayOrigin;
+  vec3 pos = (projectionMatrix * modelViewMatrix * vec4(position, 1.0)).xyz - rayOrigin;
+  // vec3 pos = (projectionMatrix * modelViewMatrix * vec4(position, 1.0)).xyz - (projectionMatrix * modelViewMatrix * vec4(rayOrigin, 1.0)).xyz;
   float touchDot = dot(ray, pos);
-  float touchNear = length((ray * pos).xyz) / length(pos);
-  float touchNearK = 0.015 / touchNear / touchNear / touchNear / touchNear;
+  // float touchNear = length((ray * pos).xyz) / length(pos);
+  // float touchNearK = 0.015 / touchNear / touchNear / touchNear / touchNear;
+  float touchNear = 1.0 / (touchDot / length(pos));
+  float touchNearK = 0.15 * touchNear;
 
   // compose both noises
   float displacement = - (noiseK + touchNearK * touchK) * (noise + b);

@@ -8,7 +8,6 @@ import useStore from '../hooks/useStore'
 
 
 export type PointCloudType = {
-  shaderRef: any
   pointCloudRef: any
 }
 
@@ -34,13 +33,12 @@ const modelsPos: { [key: string]: ModelPosType } = {
 }
 
 const PointCloud: FC<PointCloudType> = ({
-  shaderRef,
   pointCloudRef
 }) => {
   const setModelLoaded = useStore(state => state.setModelLoaded)
   const model = useStore(state => state.model)
   const asset_path = isProd() ?
-    `https://raw.githubusercontent.com/the-sociophobic/splaces/main/public/pcd/${model}.pcd`
+    `https://raw.githubusercontent.com/the-sociophobic/splaces/4e2d144f4b608c13a45c46fdb7fb5133d84a0246/public/pcd/${model}.pcd`
     :
     `./splaces/pcd/${model}.pcd`
   const obj = useLoader(
@@ -63,9 +61,7 @@ const PointCloud: FC<PointCloudType> = ({
       rotation={rotation}
       scale={[1, 1, 1]}
     >
-      <NoiseMaterial
-        shaderRef={shaderRef}
-      />
+      <NoiseMaterial />
     </primitive>
   )
 }

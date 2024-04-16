@@ -3,16 +3,11 @@ import { FC } from 'react'
 import { vertShader, fragShader } from './shaders'
 
 
-export type NoiseMaterialType = {
-  shaderRef: any
-}
+export type NoiseMaterialType = {}
 
-const NoiseMaterial: FC<NoiseMaterialType> = ({
-  shaderRef
-}) => {
+const NoiseMaterial: FC<NoiseMaterialType> = () => {
   return (
     <shaderMaterial
-      ref={shaderRef}
       fragmentShader={fragShader}
       vertexShader={vertShader}
       uniforms={{
