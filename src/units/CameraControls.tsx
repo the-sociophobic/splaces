@@ -1,7 +1,15 @@
 import { useRef, useEffect } from 'react'
+import * as THREE from 'three'
 import { OrbitControls } from '@react-three/drei'
 import type { OrbitControls as OrbitControlsType } from 'three-stdlib'
 import { isDesktop } from 'react-device-detect'
+
+import { useSubscribeThreeRef } from '../utils/ThreeRef'
+import { touchDeltaX, touchCameraStart } from './Uniforms'
+
+
+const top = new THREE.Vector3(0, 1, 0)
+const vectorToTarget = new THREE.Vector3(0, 1, 0)
 
 
 export const CameraControls: React.FC = () => {
@@ -17,6 +25,18 @@ export const CameraControls: React.FC = () => {
       controlsRef.current.update()
     }
   }, [controlsRef.current])
+
+  useSubscribeThreeRef(touchDeltaX, () => {
+    if (!controlsRef.current)
+      return
+
+    vectorToTarget.copy(touchCameraStart.current).sub(controlsRef.current.target)
+    const angle = touchDeltaX.current * Math.PI / 9
+    vectorToTarget.applyAxisAngle(top, angle)
+    controlsRef.current.object.position.copy(vectorToTarget.add(controlsRef.current.target))
+    // controlsRef.current.object.position.set(0, 0, 0)
+    controlsRef.current.update()
+  })
 
   return (
     <OrbitControls

@@ -10,7 +10,7 @@ const RayTest: React.FC = () => {
 
   useEffect(() => {
     const handleTouchMove = debounce(() => {
-      console.log(pointer)
+      // console.log(pointer)
       raycaster.setFromCamera(pointer, camera)
       set_start(raycaster.ray.origin.toArray())
       set_end(raycaster.ray.direction.clone().add(raycaster.ray.origin).toArray())
@@ -26,10 +26,10 @@ const RayTest: React.FC = () => {
   return (
     <>
       <mesh position={_start}>
-        <sphereGeometry args={[.05]} />
+        <sphereGeometry args={[.005]} />
       </mesh>
       <mesh position={_end}>
-        <sphereGeometry args={[.05]} />
+        <sphereGeometry args={[.005]} />
       </mesh>
     </>
   )

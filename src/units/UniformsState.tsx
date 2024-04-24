@@ -6,7 +6,7 @@ import { debounce } from 'lodash'
 
 import useStore from '../hooks/useStore'
 import { notifyThreeRef, useSubscribeThreeRef } from '../utils/ThreeRef'
-import { rayDirection, rayOrigin, touchK, noiseK } from './Uniforms'
+import { rayDirection, rayOrigin, touchK, noiseK, touchStartX, touchDeltaX, touchCameraStart } from './Uniforms'
 
 
 export type UniformsStateType = {
@@ -96,7 +96,7 @@ const UniformsState: FC<UniformsStateType> = ({
   }, [permissionGranted])
 
   // NOISE FADING
-  useFrame((state, deltaTime) => {
+  useFrame((_state, deltaTime) => {
     if (!materialIsDefined())
       return
 
@@ -115,7 +115,7 @@ const UniformsState: FC<UniformsStateType> = ({
 
   const { raycaster } = useThree()
   const updRayUniforms = (_pointer: Vector2) => {
-    raycaster.setFromCamera(_pointer.multiplyScalar(-1), camera)
+    raycaster.setFromCamera(_pointer, camera)
     // raycaster.setFromCamera(_pointer, camera)
     rayOrigin.current.copy(raycaster.ray.origin)
     notifyThreeRef(rayOrigin)
@@ -128,15 +128,18 @@ const UniformsState: FC<UniformsStateType> = ({
   const handleTouchMove = debounce((e: TouchEvent) => {
     if (!materialIsDefined())
       return
-
+    
     pointer.set(
-       e.touches[0].clientX * 2 - 1,
-      -e.touches[0].clientY * 2 + 1,
-      // -threePointer.x,
-      // -threePointer.y
+      //  e.touches[0].clientX * 2 - 1,
+      // -e.touches[0].clientY * 2 + 1,
+      threePointer.x,
+      threePointer.y
     )
 
     updRayUniforms(pointer)
+
+    touchDeltaX.current = threePointer.x - touchStartX.current
+    notifyThreeRef(touchDeltaX)
   })
   const handleMouseMove = debounce((e: MouseEvent) => {
     if (!materialIsDefined())
@@ -178,14 +181,24 @@ const UniformsState: FC<UniformsStateType> = ({
   // HANDLE TOUCH
   const touching = useRef(false)
   useEffect(() => {
-    const handleTouchStart = () => { touching.current = true }
+    const handleTouchStart = (e: TouchEvent) => {
+      touching.current = true
+      touchStartX.current = threePointer.x
+      notifyThreeRef(touchStartX)
+      touchCameraStart.current.copy(camera.position)
+      notifyThreeRef(touchCameraStart)
+    }
 
     window.addEventListener('touchstart', handleTouchStart)
 
     return () =>  window.removeEventListener('touchstart', handleTouchStart)
   }, [])
   useEffect(() => {
-    const handleTouchEnd = () => { touching.current = false }
+    const handleTouchEnd = () => {
+      touching.current = false
+      // touchStartX.current = 0
+      // notifyThreeRef(touchStartX)
+    }
 
     window.addEventListener('touchend', handleTouchEnd)
 

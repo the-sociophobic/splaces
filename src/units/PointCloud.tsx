@@ -15,20 +15,28 @@ export type Vector3Array = [number, number, number]
 export type ModelPosType = {
   position: Vector3Array
   rotation: Vector3Array
+  scale: Vector3Array
+  noiseKmax: number
 }
 
 const modelsPos: { [key: string]: ModelPosType } = {
   'karelia': {
     position: [0, -5.5, 1],
     rotation: [Math.PI * 1.2, 0, 0],
+    scale: [1, 1, 1],
+    noiseKmax: 5
   },
   'shipovnik': {
     position: [5, -14.5, 0],
     rotation: [Math.PI * 1.2, 0, 0],
+    scale: [1, 1, 1],
+    noiseKmax: 17
   },
   'tree': {
-    position: [0, -15.5, 1],
+    position: [-5, -3.5, 1],
     rotation: [Math.PI * 1.2, 0, -Math.PI / 2],
+    scale: [.35, .35, .35],
+    noiseKmax: 15
   },
 }
 
@@ -50,7 +58,7 @@ const PointCloud: FC<PointCloudType> = ({
         setTimeout(() => setModelLoaded(true), 5)
     }
   )
-  const { position, rotation } = modelsPos[model]
+  const { position, rotation, scale, noiseKmax } = modelsPos[model]
 
 
   return (
@@ -59,9 +67,9 @@ const PointCloud: FC<PointCloudType> = ({
       object={obj}
       position={position}
       rotation={rotation}
-      scale={[1, 1, 1]}
+      scale={scale}
     >
-      <NoiseMaterial />
+      <NoiseMaterial noiseKmax={noiseKmax} />
     </primitive>
   )
 }

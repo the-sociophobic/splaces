@@ -1,6 +1,7 @@
 const vertShader = `
 attribute vec3 color;
 uniform float noiseK;
+uniform float noiseKmax;
 uniform float touchK;
 uniform vec3 rayOrigin;
 uniform vec3 rayDirection;
@@ -36,14 +37,10 @@ void main(){
 
   // Add noise on touch
   vec3 ray = rayDirection;
-  // vec3 pos = position - rayOrigin;
-  vec3 pos = (projectionMatrix * modelViewMatrix * vec4(position, 1.0)).xyz - rayOrigin;
-  // vec3 pos = (projectionMatrix * modelViewMatrix * vec4(position, 1.0)).xyz - (projectionMatrix * modelViewMatrix * vec4(rayOrigin, 1.0)).xyz;
-  float touchDot = dot(ray, pos);
-  // float touchNear = length((ray * pos).xyz) / length(pos);
-  // float touchNearK = 0.015 / touchNear / touchNear / touchNear / touchNear;
-  float touchNear = 1.0 / (touchDot / length(pos));
-  float touchNearK = 0.15 * touchNear;
+  vec3 position2 = (modelMatrix * vec4(position, 1.0)).xyz - rayOrigin;
+  float posCamPos = dot(position2, rayDirection);
+  float KK = sqrt( dot(position2, position2) - posCamPos * posCamPos);
+  float touchNearK = noiseKmax / (KK + 1.0)  / (KK + 1.0);
 
   // compose both noises
   float displacement = - (noiseK + touchNearK * touchK) * (noise + b);
