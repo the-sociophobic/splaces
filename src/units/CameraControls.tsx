@@ -44,6 +44,41 @@ const CameraControlsDesktop: React.FC = () => {
     controlsRef.current.update()
   })
 
+  const { camera } = useThree()
+  const { permissionGranted } = useStore(state => state)
+  
+  useEffect(() => {
+    const handleDeviceMotion = debounce((event: DeviceMotionEvent) => {
+      const { rotationRate } = event
+
+      if (!rotationRate)
+        return
+      
+      acceleration.set(
+        rotationRate.alpha || 0,
+        rotationRate.beta || 0,
+        // rotationRate.gamma || 0
+        0
+      ).multiplyScalar(.0005)
+      
+      vectorToTarget.copy(target).sub(camera.position).normalize()
+      quaternion.setFromUnitVectors(front, vectorToTarget)
+      matrix.makeRotationFromQuaternion(quaternion)
+      acceleration.applyMatrix4(matrix)
+
+      vectorToTarget.copy(camera.position).add(acceleration)
+        .normalize().multiplyScalar(cameraTargetDistance)
+
+      camera.position.copy(vectorToTarget)
+      camera.lookAt(target)
+      camera.updateProjectionMatrix()
+    }, 5)
+
+    window.addEventListener('devicemotion', handleDeviceMotion)
+
+    return () => window.removeEventListener('devicemotion', handleDeviceMotion)
+  }, [permissionGranted])
+
   return (
     <OrbitControls
       ref={controlsRef}
@@ -83,8 +118,9 @@ const CameraControlsMobile: React.FC = () => {
       acceleration.set(
         rotationRate.alpha || 0,
         rotationRate.beta || 0,
-        rotationRate.gamma || 0
-      ).multiplyScalar(.001)
+        // rotationRate.gamma || 0
+        0
+      ).multiplyScalar(.0005)
       
       vectorToTarget.copy(target).sub(camera.position).normalize()
       quaternion.setFromUnitVectors(front, vectorToTarget)
@@ -107,7 +143,7 @@ const CameraControlsMobile: React.FC = () => {
   return <></>
 }
 
-export const CameraControls: React.FC = () => isDesktop ?
+export const CameraControls: React.FC = () =>// isDesktop ?
   <CameraControlsDesktop />
-  :
-  <CameraControlsMobile />
+  // :
+  // <CameraControlsMobile />

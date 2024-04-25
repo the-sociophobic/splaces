@@ -125,7 +125,8 @@ const UniformsState: FC<UniformsStateType> = ({
     notifyThreeRef(touchK)
   }
 
-  const handleTouchMove = debounce((e: TouchEvent) => {
+  // const handleTouchMove = debounce((e: TouchEvent) => {
+  const handleTouchMove = debounce(() => {
     if (!materialIsDefined())
       return
     
@@ -141,6 +142,14 @@ const UniformsState: FC<UniformsStateType> = ({
     touchDeltaX.current = threePointer.x - touchStartX.current
     notifyThreeRef(touchDeltaX)
   })
+
+  const handleScroll = debounce((e: Event) => {
+    if (!materialIsDefined())
+      return
+    
+    // touching.current = false
+  })
+
   const handleMouseMove = debounce((e: MouseEvent) => {
     if (!materialIsDefined())
       return
@@ -158,15 +167,29 @@ const UniformsState: FC<UniformsStateType> = ({
   })
 
 
-  useEffect(() => {
-    if (!isDesktop)
-      window.addEventListener('touchmove', handleTouchMove)
+  // useEffect(() => {
+  //   if (!isDesktop)
+  //     window.addEventListener('touchmove', handleTouchMove)
 
-    return () => {
-      if (!isDesktop)
-        window.removeEventListener('touchmove', handleTouchMove)
-    }
-  }, [])
+  //   return () => {
+  //     if (!isDesktop)
+  //       window.removeEventListener('touchmove', handleTouchMove)
+  //   }
+  // }, [])
+  useFrame(() => {
+    if (touching.current)
+      handleTouchMove()
+  })
+
+  // useEffect(() => {
+  //   if (!isDesktop)
+  //     window.addEventListener('scroll', handleScroll)
+
+  //   return () => {
+  //     if (!isDesktop)
+  //       window.removeEventListener('scroll', handleScroll)
+  //   }
+  // }, [])
 
   useEffect(() => {
     if (isDesktop)

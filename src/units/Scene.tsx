@@ -14,7 +14,7 @@ export const Scene: React.FC = () => {
   return (
     <Canvas
       onCreated={state => state.gl.setPixelRatio(window.devicePixelRatio)}
-      onScroll={e => e.stopPropagation()}
+      // onScroll={e => e.stopPropagation()}
       // onTouchMove={e => e.stopPropagation()}
     >
       <CameraControls />
