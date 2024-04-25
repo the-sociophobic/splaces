@@ -17,7 +17,10 @@ const RequireSensorPermisson = () => {
   ], shallow)
 
   const _permission = () => {
-    if (typeof (DeviceMotionEvent) !== 'undefined' && typeof ((DeviceMotionEvent as any).requestPermission) === 'function') {
+    if (
+      typeof (DeviceMotionEvent) !== 'undefined' &&
+      typeof ((DeviceMotionEvent as any).requestPermission) === 'function'
+    ) {
       (DeviceMotionEvent as any).requestPermission()
         .then((response: any) => {
           if (response === 'granted')

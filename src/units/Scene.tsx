@@ -8,12 +8,14 @@ import UniformsState from './UniformsState'
 
 
 
-export const Scene: React.FC = () => {  
+export const Scene: React.FC = () => {
   const pointCloudRef = useRef(null)
 
   return (
     <Canvas
-    // onCreated={state => state.gl.setClearAlpha(0)}
+      onCreated={state => state.gl.setPixelRatio(window.devicePixelRatio)}
+      onScroll={e => e.stopPropagation()}
+      // onTouchMove={e => e.stopPropagation()}
     >
       <CameraControls />
       <ambientLight />
@@ -22,9 +24,9 @@ export const Scene: React.FC = () => {
         pointCloudRef={pointCloudRef}
       />
 
-        <PointCloud
-          pointCloudRef={pointCloudRef}
-        />
+      <PointCloud
+        pointCloudRef={pointCloudRef}
+      />
     </Canvas>
   )
 }
