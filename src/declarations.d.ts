@@ -9,3 +9,9 @@ declare module "*.frag" {
   
   export default value
 }
+
+declare module "*?raw"
+{
+    const content: string;
+    export default content;
+}

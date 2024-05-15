@@ -36,7 +36,7 @@ const modelsPos: { [key: string]: ModelPosType } = {
     position: [-5, -3.5, 1],
     rotation: [Math.PI * 1.2, 0, -Math.PI / 2],
     scale: [.35, .35, .35],
-    noiseKmax: 15
+    noiseKmax: 20
   },
 }
 

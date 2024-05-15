@@ -9,7 +9,11 @@ export type StateType = {
   setPermissionGranted: (permissionGranted: boolean) => void
 }
 
-const modelOptions: modelType[] = ['karelia', 'shipovnik', 'tree']
+const modelOptions: modelType[] = [
+  'karelia',
+  'shipovnik',
+  'tree'
+]
 
 const useStore = create<StateType>(set => ({
   model: modelOptions[Math.ceil(Math.random() * modelOptions.length) - 1],

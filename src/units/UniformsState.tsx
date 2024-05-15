@@ -11,10 +11,12 @@ import {
   rayOrigin,
   touchK,
   noiseK,
-  // touching,
+  touching,
   touchStartX,
   touchDeltaX,
-  touchCameraStart
+  touchCameraStart,
+  lastTouchTimestamp,
+  cameraPos
 } from './Uniforms'
 
 
@@ -23,8 +25,7 @@ export type UniformsStateType = {
 }
 
 
-const cameraPos = new Vector3()
-const prevCameraPos = new Vector3()
+const posDelta = new Vector3()
 const pointer = new Vector2()
 
 const MAX_MOVE_NOISE = 25
@@ -64,23 +65,20 @@ const UniformsState: FC<UniformsStateType> = ({
   // CAMERA MOVEMENT NOISE
   const { permissionGranted } = useStore(state => state)
   const prevCamPos = useRef(new Vector3())
-  const { camera, pointer: threePointer } = useThree()
+  const { camera, pointer: threePointer, clock } = useThree()
 
   useFrame((state, deltaTime) => {
     if (!materialIsDefined() || permissionGranted)
       return
 
-    cameraPos.copy(camera.position)
-    prevCameraPos.copy(prevCamPos.current)
-
-    const posDelta = cameraPos.add(prevCameraPos.negate()).length()
+    posDelta.copy(cameraPos.current).sub(prevCamPos.current)
 
     noiseK.current = Math.min(
-      Math.max(noiseK.current, posDelta * 1000 * deltaTime),
+      Math.max(noiseK.current, posDelta.length() * 1000 * deltaTime),
       MAX_MOVE_NOISE
     )
     notifyThreeRef(noiseK)
-    prevCamPos.current.copy(camera.position)
+    prevCamPos.current.copy(cameraPos.current)
   })
 
   // DEVICE ACCELEROMETER NOISE
@@ -103,8 +101,6 @@ const UniformsState: FC<UniformsStateType> = ({
 
     return () => window.removeEventListener('devicemotion', handleDeviceMotion)
   }, [permissionGranted])
-
-  const touching = useRef<boolean>(false)
 
   // NOISE FADING
   useFrame((_state, deltaTime) => {
@@ -147,6 +143,11 @@ const UniformsState: FC<UniformsStateType> = ({
     if (!materialIsDefined())
       return
 
+    touching.current = true
+    notifyThreeRef(touching)
+    lastTouchTimestamp.current = clock.getElapsedTime()
+    notifyThreeRef(lastTouchTimestamp)
+
     pointer.set(
       //  e.touches[0].clientX * 2 - 1,
       // -e.touches[0].clientY * 2 + 1,
@@ -158,13 +159,14 @@ const UniformsState: FC<UniformsStateType> = ({
 
     touchDeltaX.current = threePointer.x - touchStartX.current
     notifyThreeRef(touchDeltaX)
-  })
+  }, 3)
 
   // const handleScroll = debounce((e: Event) => {
   //   if (!materialIsDefined())
   //     return
 
   //   // touching.current = false
+  //   // notifyThreeRef(touching)
   // })
 
   const handleMouseMove = debounce((e: MouseEvent) => {
@@ -215,30 +217,56 @@ const UniformsState: FC<UniformsStateType> = ({
   }, [])
 
   // HANDLE TOUCH
-  useEffect(() => {
-    const handleTouchStart = (e: TouchEvent) => {
-      touching.current = true
-      // notifyThreeRef(touching)
-      touchStartX.current = threePointer.x
-      notifyThreeRef(touchStartX)
-      touchCameraStart.current.copy(camera.position)
-      notifyThreeRef(touchCameraStart)
-    }
+  const handleTouchStart = (e: TouchEvent) => {
+    touching.current = true
+    notifyThreeRef(touching)
+    lastTouchTimestamp.current = clock.getElapsedTime()
+    notifyThreeRef(lastTouchTimestamp)
 
+    touchCameraStart.current.copy(cameraPos.current)
+    notifyThreeRef(touchCameraStart)
+    touchStartX.current = threePointer.x
+    notifyThreeRef(touchStartX)
+  }
+
+  useEffect(() => {
     window.addEventListener('touchstart', handleTouchStart)
 
     return () => window.removeEventListener('touchstart', handleTouchStart)
   }, [])
-  useEffect(() => {
-    const handleTouchEnd = () => {
-      touching.current = false
-      // notifyThreeRef(touching)
-    }
 
+  const handleTouchEnd = () => {
+    touching.current = false
+    notifyThreeRef(touching)
+    // touchStartX.current = 0
+    // notifyThreeRef(touchStartX)
+    // touchCameraStart.current.set(0, 0, 0)
+    // notifyThreeRef(touchCameraStart)
+  }
+
+  useEffect(() => {
     window.addEventListener('touchend', handleTouchEnd)
 
     return () => window.removeEventListener('touchend', handleTouchEnd)
   }, [])
+  useEffect(() => {
+    window.addEventListener('touchcancel', handleTouchEnd)
+
+    return () => window.removeEventListener('touchcancel', handleTouchEnd)
+  }, [])
+
+  useEffect(() => {
+    clock.start()
+  }, [])
+
+  useFrame(state => {
+    const timeSinceLastKnownTouch = state.clock.getElapsedTime() - lastTouchTimestamp.current
+
+    if (timeSinceLastKnownTouch > .45 && touching.current) {
+      touching.current = false
+      notifyThreeRef(touching)
+    }
+  })
 
   return (
     <></>

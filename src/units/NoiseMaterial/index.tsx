@@ -1,6 +1,7 @@
 import { FC } from 'react'
 
-import { vertShader, fragShader } from './shaders'
+import vertShader from './shader.vert?raw'
+import fragShader from './shader.frag?raw'
 
 
 export type NoiseMaterialType = {
